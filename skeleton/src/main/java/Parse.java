@@ -57,7 +57,7 @@ public class Parse {
         Stack<String> stack = new Stack<String>();
         stack.push("S");
         while(!tokens.isEmpty()){
-            if(stack.empty())
+            if(stack.isEmpty())
                 return false;
             if(tokens.get(0).equals(stack.peek())) {
                 tokens.remove(0);
