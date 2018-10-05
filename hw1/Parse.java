@@ -1,32 +1,33 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 class ParseException extends Exception {
-    public ParseException() {
+    ParseException() {
         super("Parse error");
     }
 }
 
 public class Parse {
     private static final List<String> TokenList =
-        Arrays.asList("{", "}", "System.out.println", "(", ")", ";", "if", "else", "while", "true", "false", "!");
+            Arrays.asList("{", "}", "System.out.println", "(", ")", ";", "if", "else", "while", "true", "false", "!");
 
-    public static void main (String [] args) throws Exception {
-        BufferedReader br  = new BufferedReader(new InputStreamReader(System.in));
-        String s = null;
-        String contents = "";
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s;
+        StringBuilder contents = new StringBuilder();
         while ((s = br.readLine()) != null) {
-            contents += s + " ";
+            contents.append(s);
+            contents.append(" ");
         }
         br.close();
 
         try {
-            if(parsable(tokenize(contents))) {
+            if (parsable(tokenize(contents.toString()))) {
                 System.out.println("Program parsed successfully");
             } else {
                 throw new ParseException();
@@ -36,13 +37,13 @@ public class Parse {
         }
     }
 
-    private static List<String> tokenize (String s) throws ParseException {
-        List<String> tokens = new ArrayList<String>();
-        while(!s.trim().isEmpty()) {
-            final String cur = s;
+    private static List<String> tokenize(String s) throws ParseException {
+        List<String> tokens = new ArrayList<>();
+        while (!s.trim().isEmpty()) {
+            String cur = s;
             List<String> matches = TokenList.stream()
-                .filter((String token) -> cur.trim().startsWith(token))
-                .collect(Collectors.toList());
+                    .filter((String token) -> cur.trim().startsWith(token))
+                    .collect(Collectors.toList());
             if (matches.isEmpty()) {
                 throw new ParseException();
             } else {
@@ -53,13 +54,13 @@ public class Parse {
         return tokens;
     }
 
-    private static boolean parsable (List<String> tokens) {
-        Stack<String> stack = new Stack<String>();
+    private static boolean parsable(List<String> tokens) {
+        Stack<String> stack = new Stack<>();
         stack.push("S");
-        while(!tokens.isEmpty()){
-            if(stack.isEmpty())
+        while (!tokens.isEmpty()) {
+            if (stack.isEmpty())
                 return false;
-            if(tokens.get(0).equals(stack.peek())) {
+            if (tokens.get(0).equals(stack.peek())) {
                 tokens.remove(0);
                 stack.pop();
             } else if (stack.peek().equals("S") && tokens.get(0).equals("{")) {
@@ -90,11 +91,10 @@ public class Parse {
                 stack.push("E");
                 stack.push("(");
                 stack.push("while");
-            } else if (stack.peek().equals("L") &&
-                       (tokens.get(0).equals("{") ||
-                        tokens.get(0).equals("System.out.println") ||
-                        tokens.get(0).equals("if") ||
-                        tokens.get(0).equals("while"))) {
+            } else if (stack.peek().equals("L") && (tokens.get(0).equals("{") ||
+                    tokens.get(0).equals("System.out.println") ||
+                    tokens.get(0).equals("if") ||
+                    tokens.get(0).equals("while"))) {
                 stack.pop();
                 stack.push("L");
                 stack.push("S");
