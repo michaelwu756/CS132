@@ -2,6 +2,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import typecheck.Helper;
 import typecheck.LinkSetPair;
+import typecheck.MethodSignature;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -108,5 +109,66 @@ public class MainTest {
         assertEquals("int[]", fields("A").get("size"));
         assertEquals(2, fields("C").size());
         assertEquals("int", fields("BBS").get("size"));
+    }
+
+    @Test
+    public void detectsMethods() {
+        String input =
+                "class BubbleSort { " +
+                        "   public static void main(String[] a){ }" +
+                        "}" +
+                        "class B { public int a() { return 1; } }" +
+                        "class A extends B { public bool a() { return 2; } }" +
+                        "class C extends A { public bool b(int f, bool s) { return false; } }";
+        InputStream s = new ByteArrayInputStream(input.getBytes());
+        MiniJavaParser.ReInit(s);
+        try {
+            Helper.init(MiniJavaParser.Goal());
+        } catch (Exception e) {
+            fail();
+        }
+        assertEquals(new MethodSignature(new ArrayList<>(), "int"), methodType("B", "a"));
+        assertEquals(new MethodSignature(new ArrayList<>(), "bool"), methodType("A", "a"));
+        assertEquals(new MethodSignature(Arrays.asList("int", "bool"), "bool"), methodType("C", "b"));
+        assertEquals(new MethodSignature(new ArrayList<>(), "bool"), methodType("C", "a"));
+        assertNull(methodType("B", "b"));
+    }
+
+    @Test
+    public void detectsOverrides() {
+        String input =
+                "class BubbleSort { " +
+                        "   public static void main(String[] a){ }" +
+                        "}" +
+                        "class B { public int a() { return 1; } }" +
+                        "class A extends B { public bool a() { return 2; } }" +
+                        "class C extends A { public bool b(int f, bool s) { return false; } }";
+        InputStream s = new ByteArrayInputStream(input.getBytes());
+        MiniJavaParser.ReInit(s);
+        try {
+            Helper.init(MiniJavaParser.Goal());
+        } catch (Exception e) {
+            fail();
+        }
+        assertFalse(noOverrides("A", "B", "a"));
+    }
+
+    @Test
+    public void detectsNoOverrides() {
+        String input =
+                "class BubbleSort { " +
+                        "   public static void main(String[] a){ }" +
+                        "}" +
+                        "class B { public int a() { return 1; } }" +
+                        "class A extends B { public int a() { return 2; } }" +
+                        "class C extends A { public bool b(int f, bool s) { return false; } }";
+        InputStream s = new ByteArrayInputStream(input.getBytes());
+        MiniJavaParser.ReInit(s);
+        try {
+            Helper.init(MiniJavaParser.Goal());
+        } catch (Exception e) {
+            fail();
+        }
+        assertTrue(noOverrides("A", "B", "a"));
     }
 }

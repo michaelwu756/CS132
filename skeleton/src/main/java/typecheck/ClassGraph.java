@@ -13,14 +13,14 @@ public class ClassGraph {
     }
 
     public void addVertex(String name) {
-        if(!name.equals("") && vertexMap.get(name)==null) {
+        if (!name.equals("") && vertexMap.get(name) == null) {
             vertexMap.put(name, new Vertex());
             root.addChildVertex(vertexMap.get(name));
         }
     }
 
     public void addEdge(String child, String parent) {
-        if(!child.equals("") && !parent.equals("") && vertexMap.get(parent)!=null && vertexMap.get(child)!=null) {
+        if (!child.equals("") && !parent.equals("") && vertexMap.get(parent) != null && vertexMap.get(child) != null) {
             Vertex vc = vertexMap.get(child);
             Vertex vp = vertexMap.get(parent);
             vp.addChildVertex(vc);
@@ -41,7 +41,7 @@ public class ClassGraph {
         vertexMap.keySet().forEach(start -> {
             Map<String, Boolean> reachableNodes = new HashMap<>();
             vertexMap.keySet().forEach(finish -> {
-                if(vertexMap.get(start).canReach(vertexMap.get(finish))) {
+                if (vertexMap.get(start).canReach(vertexMap.get(finish))) {
                     reachableNodes.put(finish, true);
                 } else {
                     reachableNodes.put(finish, false);
@@ -57,5 +57,9 @@ public class ClassGraph {
 
     public Map<String, String> getFields(String name) {
         return vertexMap.get(name).getTypeAssociations();
+    }
+
+    public Map<String, MethodSignature> getMethods(String name) {
+        return vertexMap.get(name).getMethodAssociations();
     }
 }
