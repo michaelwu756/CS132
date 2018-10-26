@@ -75,7 +75,9 @@ public class MainTest {
                 "class BubbleSort { " +
                         "   public static void main(String[] a){ }" +
                         "}" +
-                        "class A extends B {}";
+                        "class B {}" +
+                        "class A extends B {}" +
+                        "class C extends D {}";
         InputStream s = new ByteArrayInputStream(input.getBytes());
         MiniJavaParser.ReInit(s);
         try {
@@ -85,6 +87,7 @@ public class MainTest {
         }
         assertTrue(subtype("A", "B"));
         assertFalse(subtype("B", "A"));
+        assertFalse(subtype("C", "D"));
         assertTrue(subtype("B", "B"));
     }
 
@@ -135,7 +138,7 @@ public class MainTest {
     }
 
     @Test
-    public void detectsOverrides() {
+    public void detectsOverloading() {
         String input =
                 "class BubbleSort { " +
                         "   public static void main(String[] a){ }" +

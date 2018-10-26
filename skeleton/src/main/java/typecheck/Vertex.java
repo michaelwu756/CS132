@@ -16,6 +16,7 @@ public class Vertex {
         visited = true;
         for (Vertex vertex : childVertices) {
             if (vertex.isVisited() || !vertex.doesNotLeadToCycle()) {
+                visited=false;
                 return false;
             }
         }
@@ -30,6 +31,7 @@ public class Vertex {
         visited = true;
         for (Vertex vertex : childVertices) {
             if (!vertex.isVisited() && vertex.canReach(v)) {
+                visited=false;
                 return true;
             }
         }
