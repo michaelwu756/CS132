@@ -1,7 +1,7 @@
+import javafx.util.Pair;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import typecheck.Helper;
-import typecheck.LinkSetPair;
 import typecheck.MethodSignature;
 
 import java.io.BufferedReader;
@@ -28,27 +28,27 @@ public class MainTest {
 
     @Test
     public void detectsAcyclic() {
-        Set<LinkSetPair> linkSetPairs = new HashSet<>();
-        linkSetPairs.add(new LinkSetPair("1", "2"));
-        linkSetPairs.add(new LinkSetPair("2", "3"));
+        Set<Pair<String, String>> linkSetPairs = new HashSet<>();
+        linkSetPairs.add(new Pair<>("1", "2"));
+        linkSetPairs.add(new Pair<>("2", "3"));
         assertTrue(acyclic(linkSetPairs));
     }
 
     @Test
     public void detectsCyclic() {
-        Set<LinkSetPair> linkSetPairs = new HashSet<>();
-        linkSetPairs.add(new LinkSetPair("1", "2"));
-        linkSetPairs.add(new LinkSetPair("2", "3"));
-        linkSetPairs.add(new LinkSetPair("3", "1"));
+        Set<Pair<String, String>> linkSetPairs = new HashSet<>();
+        linkSetPairs.add(new Pair<>("1", "2"));
+        linkSetPairs.add(new Pair<>("2", "3"));
+        linkSetPairs.add(new Pair<>("3", "1"));
         assertFalse(acyclic(linkSetPairs));
     }
 
     @Test
     public void detectsSelfCyclic() {
-        Set<LinkSetPair> linkSetPairs = new HashSet<>();
-        linkSetPairs.add(new LinkSetPair("1", "2"));
-        linkSetPairs.add(new LinkSetPair("2", "3"));
-        linkSetPairs.add(new LinkSetPair("3", "3"));
+        Set<Pair<String, String>> linkSetPairs = new HashSet<>();
+        linkSetPairs.add(new Pair<>("1", "2"));
+        linkSetPairs.add(new Pair<>("2", "3"));
+        linkSetPairs.add(new Pair<>("3", "3"));
         assertFalse(acyclic(linkSetPairs));
     }
 
@@ -150,7 +150,7 @@ public class MainTest {
         } catch (Exception e) {
             fail();
         }
-        assertFalse(noOverrides("A", "B", "a"));
+        assertFalse(noOverloading("A", "B", "a"));
     }
 
     @Test
@@ -169,6 +169,6 @@ public class MainTest {
         } catch (Exception e) {
             fail();
         }
-        assertTrue(noOverrides("A", "B", "a"));
+        assertTrue(noOverloading("A", "B", "a"));
     }
 }

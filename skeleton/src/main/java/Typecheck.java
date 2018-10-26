@@ -26,7 +26,7 @@ public class Typecheck {
             Helper.init(MiniJavaParser.Goal());
             TypeCheckVisitor visitor = new TypeCheckVisitor();
             MiniJavaParser.ReInit(new ByteArrayInputStream(contents.toString().getBytes()));
-            visitor.visit(MiniJavaParser.Goal());
+            visitor.visit(MiniJavaParser.Goal(), null);
             if (visitor.correctlyTypeChecks()) {
                 System.out.println("Program type checked successfully");
             } else {

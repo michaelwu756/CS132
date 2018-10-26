@@ -1,18 +1,19 @@
 package typecheck;
 
+import javafx.util.Pair;
 import syntaxtree.*;
-import visitor.DepthFirstVisitor;
+import visitor.GJDepthFirst;
 
 import java.util.*;
 
 import static typecheck.Helper.*;
 
-public class TypeCheckVisitor extends DepthFirstVisitor {
+public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<String, String>>> {
     private boolean typeChecks = true;
 
-    public void visit(Goal n) {
+    public String visit(Goal n, Pair<String, Map<String, String>> env) {
         List<String> classNames = new ArrayList<>();
-        Set<LinkSetPair> fullLinkSet = new HashSet<>();
+        Set<Pair<String, String>> fullLinkSet = new HashSet<>();
         classNames.add(className(n.f0));
         for (Enumeration<Node> e = n.f1.elements(); e.hasMoreElements(); ) {
             Node next = e.nextElement();
@@ -32,12 +33,33 @@ public class TypeCheckVisitor extends DepthFirstVisitor {
         if (!distinct(classNames) || !acyclic(fullLinkSet)) {
             typeChecks = false;
         } else {
-            super.visit(n);
+            super.visit(n, env);
         }
+        return null;
     }
 
-    public void visit(NodeToken n) {
+    public String visit(MainClass n, Pair<String, Map<String, String>> env) {
+        return super.visit(n, env);
+    }
+
+    public String visit(ClassDeclaration n, Pair<String, Map<String, String>> env) {
+        return super.visit(n, env);
+    }
+
+    public String visit(ClassExtendsDeclaration n, Pair<String, Map<String, String>> env) {
+        return super.visit(n, env);
+    }
+
+    public String visit(NodeToken n, Pair<String, Map<String, String>> env) {
         System.err.print("\"" + n.toString() + "\" ");
+        return super.visit(n, env);
+    }
+
+    public String visit(Type n, Pair<String, Map<String, String>> env) {
+        if (!isDefinedType(extractTypeString(n))) {
+            typeChecks = false;
+        }
+        return super.visit(n, env);
     }
 
     public boolean correctlyTypeChecks() {

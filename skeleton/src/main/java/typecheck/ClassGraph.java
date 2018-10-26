@@ -1,15 +1,22 @@
 package typecheck;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ClassGraph {
     private Vertex root = new Vertex();
     private Map<String, Vertex> vertexMap = new HashMap<>();
     private Map<String, Map<String, Boolean>> transitiveClosure = null;
+    private List<String> definedClasses = new ArrayList<>();
 
     public ClassGraph() {
         vertexMap.put("", root);
+    }
+
+    public void addDefinedClass(String className) {
+        definedClasses.add(className);
     }
 
     public void addVertex(String name) {
@@ -53,6 +60,10 @@ public class ClassGraph {
 
     public boolean hasSubtypeRelation(String child, String parent) {
         return transitiveClosure != null ? transitiveClosure.get(parent).get(child) : false;
+    }
+
+    public boolean hasDefinedClass(String className) {
+        return definedClasses.contains(className);
     }
 
     public Map<String, String> getFields(String name) {

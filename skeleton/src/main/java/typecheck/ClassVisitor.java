@@ -21,6 +21,7 @@ public class ClassVisitor extends DepthFirstVisitor {
     public void visit(ClassDeclaration n) {
         String id = n.f1.f0.toString();
         graph.addVertex(id);
+        graph.addDefinedClass(id);
         extractVars(id, n.f3);
         extractMethods(id, n.f4);
         super.visit(n);
@@ -30,6 +31,7 @@ public class ClassVisitor extends DepthFirstVisitor {
         String id = n.f1.f0.toString();
         String parentId = n.f3.f0.toString();
         graph.addVertex(id);
+        graph.addDefinedClass(id);
         graph.addVertex(parentId);
         graph.addEdge(id, parentId);
         extractVars(id, n.f5);

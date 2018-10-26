@@ -1,5 +1,6 @@
 package typecheck;
 
+import javafx.util.Pair;
 import syntaxtree.*;
 
 import java.util.*;
@@ -26,17 +27,17 @@ public class Helper {
         return n.f1.f0.toString();
     }
 
-    public static Set<LinkSetPair> linkSet(MainClass n) {
+    public static Set<Pair<String, String>> linkSet(MainClass n) {
         return new HashSet<>();
     }
 
-    public static Set<LinkSetPair> linkSet(ClassDeclaration n) {
+    public static Set<Pair<String, String>> linkSet(ClassDeclaration n) {
         return new HashSet<>();
     }
 
-    public static Set<LinkSetPair> linkSet(ClassExtendsDeclaration n) {
-        Set<LinkSetPair> result = new HashSet<>();
-        result.add(new LinkSetPair(n.f1.f0.toString(), n.f3.f0.toString()));
+    public static Set<Pair<String, String>> linkSet(ClassExtendsDeclaration n) {
+        Set<Pair<String, String>> result = new HashSet<>();
+        result.add(new Pair<>(n.f1.f0.toString(), n.f3.f0.toString()));
         return result;
     }
 
@@ -72,32 +73,44 @@ public class Helper {
     }
 
     public static boolean subtype(String child, String parent) {
-        return graph.hasSubtypeRelation(child, parent);
+        return isDefinedClass(child) && isDefinedClass(parent) && graph.hasSubtypeRelation(child, parent);
     }
 
     public static boolean distinct(List<String> l) {
         return new HashSet<String>(l).size() == l.size();
     }
 
-    public static boolean acyclic(Set<LinkSetPair> s) {
+    public static boolean acyclic(Set<Pair<String, String>> s) {
         ClassGraph graph = new ClassGraph();
-        for (LinkSetPair pair : s) {
-            graph.addVertex(pair.getId());
-            graph.addVertex(pair.getParentId());
-            graph.addEdge(pair.getId(), pair.getParentId());
+        for (Pair<String, String> pair : s) {
+            graph.addVertex(pair.getKey());
+            graph.addVertex(pair.getValue());
+            graph.addEdge(pair.getKey(), pair.getValue());
         }
         return graph.hasNoCycles();
     }
 
     public static Map<String, String> fields(String className) {
-        return graph.getFields(className);
+        return isDefinedClass(className) ? graph.getFields(className) : null;
     }
 
     public static MethodSignature methodType(String className, String methodName) {
-        return graph.getMethods(className).get(methodName);
+        return isDefinedClass(className) ? graph.getMethods(className).get(methodName) : null;
     }
 
-    public static boolean noOverrides(String child, String parent, String methodName) {
-        return methodType(parent, methodName) == null || methodType(parent, methodName).equals(methodType(child, methodName));
+    public static boolean noOverloading(String child, String parent, String methodName) {
+        return !isDefinedClass(child) ||
+                !isDefinedClass(parent) ||
+                !subtype(child, parent) ||
+                methodType(parent, methodName) == null ||
+                methodType(parent, methodName).equals(methodType(child, methodName));
+    }
+
+    public static boolean isDefinedClass(String className) {
+        return graph.hasDefinedClass(className);
+    }
+
+    public static boolean isDefinedType(String type) {
+        return isDefinedClass(type) || type.equals("int") || type.equals("int[]") || type.equals("boolean");
     }
 }
