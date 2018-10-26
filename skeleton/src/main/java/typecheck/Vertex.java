@@ -16,7 +16,7 @@ public class Vertex {
         visited = true;
         for (Vertex vertex : childVertices) {
             if (vertex.isVisited() || !vertex.doesNotLeadToCycle()) {
-                visited=false;
+                visited = false;
                 return false;
             }
         }
@@ -31,7 +31,7 @@ public class Vertex {
         visited = true;
         for (Vertex vertex : childVertices) {
             if (!vertex.isVisited() && vertex.canReach(v)) {
-                visited=false;
+                visited = false;
                 return true;
             }
         }
@@ -51,12 +51,12 @@ public class Vertex {
         return visited;
     }
 
-    public void addTypeAssociation(String id, String type) {
-        typeAssociations.put(id, type);
+    public void addTypeAssociation(Map<String, String> associations) {
+        typeAssociations.putAll(associations);
     }
 
-    public void addMethodAssociation(String id, MethodSignature signature) {
-        methodAssociations.put(id, signature);
+    public void addMethodAssociation(Map<String, MethodSignature> associations) {
+        methodAssociations.putAll(associations);
     }
 
     public Map<String, MethodSignature> getMethodAssociations() {

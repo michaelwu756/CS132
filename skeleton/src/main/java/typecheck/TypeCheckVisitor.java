@@ -4,7 +4,9 @@ import javafx.util.Pair;
 import syntaxtree.*;
 import visitor.GJDepthFirst;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static typecheck.Helper.*;
 
@@ -12,34 +14,23 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
     private boolean typeChecks = true;
 
     public String visit(Goal n, Pair<String, Map<String, String>> env) {
-        List<String> classNames = new ArrayList<>();
-        Set<Pair<String, String>> fullLinkSet = new HashSet<>();
-        classNames.add(className(n.f0));
-        for (Enumeration<Node> e = n.f1.elements(); e.hasMoreElements(); ) {
-            Node next = e.nextElement();
-            if (next instanceof TypeDeclaration) {
-                Node classDeclarationNode = ((TypeDeclaration) next).f0.choice;
-                if (classDeclarationNode instanceof ClassDeclaration) {
-                    ClassDeclaration classDeclaration = (ClassDeclaration) classDeclarationNode;
-                    classNames.add(className(classDeclaration));
-                    fullLinkSet.addAll(linkSet(classDeclaration));
-                } else if (classDeclarationNode instanceof ClassExtendsDeclaration) {
-                    ClassExtendsDeclaration classExtendsDeclaration = (ClassExtendsDeclaration) classDeclarationNode;
-                    classNames.add(className(classExtendsDeclaration));
-                    fullLinkSet.addAll(linkSet(classExtendsDeclaration));
-                }
-            }
-        }
+        List<String> classNames = extractClassNames(n);
+        Set<Pair<String, String>> fullLinkSet = extractFullLinkSet(n);
         if (!distinct(classNames) || !acyclic(fullLinkSet)) {
             typeChecks = false;
-        } else {
-            super.visit(n, env);
+            return null;
         }
-        return null;
+        return super.visit(n, env);
     }
 
     public String visit(MainClass n, Pair<String, Map<String, String>> env) {
-        return super.visit(n, env);
+        List<String> varNames = extractVarIds(n.f14);
+        Map<String, String> varMap = extractVarMap(n.f14);
+        if (!distinct(varNames)) {
+            typeChecks = false;
+            return null;
+        }
+        return super.visit(n, new Pair<>(null, varMap));
     }
 
     public String visit(ClassDeclaration n, Pair<String, Map<String, String>> env) {
