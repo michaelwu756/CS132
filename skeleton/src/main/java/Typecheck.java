@@ -1,18 +1,26 @@
+import typecheck.Helper;
+import typecheck.TypeCheckVisitor;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public class Typecheck {
 
-    public static void main (String [] args) {
+    public static void main(String[] args) {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        MiniJavaParser parser = new MiniJavaParser(br);
-        try{
-            TypecheckVisitor visitor = new TypecheckVisitor();
+        new MiniJavaParser(br);
+        try {
+            Helper.init(MiniJavaParser.Goal());
+            TypeCheckVisitor visitor = new TypeCheckVisitor();
             visitor.visit(MiniJavaParser.Goal());
+            if (visitor.correctlyTypeChecks()) {
+                System.out.println("Program type checked successfully");
+            } else {
+                System.out.println("Type error");
+            }
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Parse error");
         }
-        System.out.println("Program type checked successfully");
     }
 
 }
