@@ -331,7 +331,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
         return expressionType;
     }
 
-    public List<String> getExpressionListTypes(NodeOptional n, Pair<String, Map<String, String>> env) {
+    private List<String> getExpressionListTypes(NodeOptional n, Pair<String, Map<String, String>> env) {
         List<String> result = new ArrayList<>();
         if (n.present() && n.node instanceof ExpressionList) {
             ExpressionList expressionList = (ExpressionList) n.node;

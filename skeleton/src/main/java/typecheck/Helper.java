@@ -182,7 +182,7 @@ public class Helper {
     }
 
     public static boolean distinct(List<String> l) {
-        return new HashSet<String>(l).size() == l.size();
+        return new HashSet<>(l).size() == l.size();
     }
 
     public static boolean acyclic(Set<Pair<String, String>> s) {
@@ -204,11 +204,15 @@ public class Helper {
     }
 
     public static boolean noOverloading(String child, String parent, String methodName) {
-        return !isDefinedClass(child) ||
-                !isDefinedClass(parent) ||
-                !subtype(child, parent) ||
-                methodType(parent, methodName) == null ||
-                methodType(parent, methodName).equals(methodType(child, methodName));
+        if (!isDefinedClass(child) || !isDefinedClass(parent) || !subtype(child, parent)) {
+            return false;
+        }
+        MethodSignature parentSignature = methodType(parent, methodName);
+        MethodSignature childSignature = methodType(child, methodName);
+        if (parentSignature == null || childSignature == null) {
+            return false;
+        }
+        return parentSignature.equals(childSignature);
     }
 
     public static boolean isDefinedClass(String className) {
