@@ -1,6 +1,5 @@
 package typecheck;
 
-import javafx.util.Pair;
 import syntaxtree.*;
 import visitor.GJDepthFirst;
 

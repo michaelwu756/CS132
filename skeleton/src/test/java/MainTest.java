@@ -1,8 +1,8 @@
-import javafx.util.Pair;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import typecheck.Helper;
 import typecheck.MethodSignature;
+import typecheck.Pair;
 import typecheck.TypeCheckVisitor;
 
 import java.io.BufferedReader;
