@@ -26,7 +26,26 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
             typeChecks = false;
             return null;
         }
-        return super.visit(n, new Pair<>(null, extractVarMap(n.f14)));
+        Pair<String, Map<String, String>> newEnv = new Pair<>(null, extractVarMap(n.f14));
+        n.f0.accept(this, env);
+        n.f1.accept(this, env);
+        n.f2.accept(this, env);
+        n.f3.accept(this, env);
+        n.f4.accept(this, env);
+        n.f5.accept(this, env);
+        n.f6.accept(this, env);
+        n.f7.accept(this, env);
+        n.f8.accept(this, env);
+        n.f9.accept(this, env);
+        n.f10.accept(this, env);
+        n.f11.accept(this, env);
+        n.f12.accept(this, env);
+        n.f13.accept(this, env);
+        n.f14.accept(this, env);
+        n.f15.accept(this, newEnv);
+        n.f16.accept(this, env);
+        n.f17.accept(this, env);
+        return null;
     }
 
     public String visit(ClassDeclaration n, Pair<String, Map<String, String>> env) {
@@ -34,12 +53,19 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
             typeChecks = false;
             return null;
         }
-        return super.visit(n, new Pair<>(className(n), null));
+        Pair<String, Map<String, String>> newEnv = new Pair<>(className(n), null);
+        n.f0.accept(this, env);
+        n.f1.accept(this, env);
+        n.f2.accept(this, env);
+        n.f3.accept(this, env);
+        n.f4.accept(this, newEnv);
+        n.f5.accept(this, env);
+        return null;
     }
 
     public String visit(ClassExtendsDeclaration n, Pair<String, Map<String, String>> env) {
         List<String> methodNames = extractMethodNames(n.f6);
-        if (!distinct(extractVarIds(n.f5)) || !distinct(methodNames) || !isDefinedClass(n.f3.f0.toString())) {
+        if (!distinct(extractVarIds(n.f5)) || !distinct(methodNames) || !subtype(className(n), n.f3.f0.toString())) {
             typeChecks = false;
             return null;
         }
@@ -49,7 +75,16 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
                 return null;
             }
         }
-        return super.visit(n, new Pair<>(className(n), null));
+        Pair<String, Map<String, String>> newEnv = new Pair<>(className(n), null);
+        n.f0.accept(this, env);
+        n.f1.accept(this, env);
+        n.f2.accept(this, env);
+        n.f3.accept(this, env);
+        n.f4.accept(this, env);
+        n.f5.accept(this, env);
+        n.f6.accept(this, newEnv);
+        n.f7.accept(this, env);
+        return null;
     }
 
     public String visit(MethodDeclaration n, Pair<String, Map<String, String>> env) {
@@ -76,17 +111,18 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
         String returnType = n.f10.accept(this, newEnv);
         n.f11.accept(this, env);
         n.f12.accept(this, env);
-        if (returnType == null || !returnType.equals(extractTypeString(n.f1))) {
+        if (!subtype(returnType,extractTypeString(n.f1))) {
             typeChecks = false;
         }
         return null;
     }
 
     public String visit(Type n, Pair<String, Map<String, String>> env) {
+        n.f0.accept(this, env);
         if (!isDefinedType(extractTypeString(n))) {
             typeChecks = false;
         }
-        return super.visit(n, env);
+        return null;
     }
 
     public String visit(Statement n, Pair<String, Map<String, String>> env) {
@@ -275,7 +311,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
 
     public String visit(Identifier n, Pair<String, Map<String, String>> env) {
         n.f0.accept(this, env);
-        if (env.getValue() != null) {
+        if (env != null && env.getValue() != null) {
             return env.getValue().get(n.f0.toString());
         }
         return null;
