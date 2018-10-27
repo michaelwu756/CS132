@@ -177,7 +177,8 @@ public class Helper {
     }
 
     public static boolean subtype(String child, String parent) {
-        return isDefinedClass(child) && isDefinedClass(parent) && graph.hasSubtypeRelation(child, parent);
+        return isPrimitiveType(child) && isPrimitiveType(parent) && child.equals(parent) ||
+                isDefinedClass(child) && isDefinedClass(parent) && graph.hasSubtypeRelation(child, parent);
     }
 
     public static boolean distinct(List<String> l) {
@@ -211,10 +212,14 @@ public class Helper {
     }
 
     public static boolean isDefinedClass(String className) {
-        return graph.hasDefinedClass(className);
+        return className != null && graph.hasDefinedClass(className);
+    }
+
+    public static boolean isPrimitiveType(String type) {
+        return "int".equals(type) || "int[]".equals(type) || "boolean".equals(type);
     }
 
     public static boolean isDefinedType(String type) {
-        return isDefinedClass(type) || type.equals("int") || type.equals("int[]") || type.equals("boolean");
+        return isDefinedClass(type) || isPrimitiveType(type);
     }
 }

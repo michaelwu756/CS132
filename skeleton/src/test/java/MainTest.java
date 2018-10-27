@@ -3,10 +3,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import typecheck.Helper;
 import typecheck.MethodSignature;
+import typecheck.TypeCheckVisitor;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
@@ -23,6 +23,7 @@ public class MainTest {
     @Test
     public void testAppHasAGreeting() {
         Typecheck classUnderTest = new Typecheck();
+        assertNotNull(classUnderTest);
         assertTrue(true);
     }
 
@@ -78,8 +79,7 @@ public class MainTest {
                         "class B {}" +
                         "class A extends B {}" +
                         "class C extends D {}";
-        InputStream s = new ByteArrayInputStream(input.getBytes());
-        MiniJavaParser.ReInit(s);
+        MiniJavaParser.ReInit(new ByteArrayInputStream(input.getBytes()));
         try {
             Helper.init(MiniJavaParser.Goal());
         } catch (Exception e) {
@@ -101,8 +101,7 @@ public class MainTest {
                         "class A extends B { int[] size; int b;}" +
                         "class C extends A {}" +
                         "class BBS extends B { int[] number; int size; }";
-        InputStream s = new ByteArrayInputStream(input.getBytes());
-        MiniJavaParser.ReInit(s);
+        MiniJavaParser.ReInit(new ByteArrayInputStream(input.getBytes()));
         try {
             Helper.init(MiniJavaParser.Goal());
         } catch (Exception e) {
@@ -123,8 +122,7 @@ public class MainTest {
                         "class B { public int a() { return 1; } }" +
                         "class A extends B { public bool a() { return 2; } }" +
                         "class C extends A { public bool b(int f, bool s) { return false; } }";
-        InputStream s = new ByteArrayInputStream(input.getBytes());
-        MiniJavaParser.ReInit(s);
+        MiniJavaParser.ReInit(new ByteArrayInputStream(input.getBytes()));
         try {
             Helper.init(MiniJavaParser.Goal());
         } catch (Exception e) {
@@ -146,8 +144,7 @@ public class MainTest {
                         "class B { public int a() { return 1; } }" +
                         "class A extends B { public bool a() { return 2; } }" +
                         "class C extends A { public bool b(int f, bool s) { return false; } }";
-        InputStream s = new ByteArrayInputStream(input.getBytes());
-        MiniJavaParser.ReInit(s);
+        MiniJavaParser.ReInit(new ByteArrayInputStream(input.getBytes()));
         try {
             Helper.init(MiniJavaParser.Goal());
         } catch (Exception e) {
@@ -165,13 +162,40 @@ public class MainTest {
                         "class B { public int a() { return 1; } }" +
                         "class A extends B { public int a() { return 2; } }" +
                         "class C extends A { public bool b(int f, bool s) { return false; } }";
-        InputStream s = new ByteArrayInputStream(input.getBytes());
-        MiniJavaParser.ReInit(s);
+        MiniJavaParser.ReInit(new ByteArrayInputStream(input.getBytes()));
         try {
             Helper.init(MiniJavaParser.Goal());
         } catch (Exception e) {
             fail();
         }
         assertTrue(noOverloading("A", "B", "a"));
+    }
+
+    @Test
+    public void basicTest() {
+        String input =
+                "class Main {\n" +
+                        "\tpublic static void main(String[] a){\n" +
+                        "\t\tSystem.out.println(new A().run());\n" +
+                        "\t}\n" +
+                        "}\n" +
+                        "\n" +
+                        "class A {\n" +
+                        "\tpublic int run() {\n" +
+                        "\t\tint x;\n" +
+                        "\t\tx = 1;\n" +
+                        "\t\treturn x;\n" +
+                        "\t}\n" +
+                        "}\n";
+        MiniJavaParser.ReInit(new ByteArrayInputStream(input.getBytes()));
+        TypeCheckVisitor visitor = new TypeCheckVisitor();
+        try {
+            Helper.init(MiniJavaParser.Goal());
+            MiniJavaParser.ReInit(new ByteArrayInputStream(input.getBytes()));
+            visitor.visit(MiniJavaParser.Goal(), null);
+        } catch (Exception e) {
+            fail();
+        }
+        assertTrue(visitor.correctlyTypeChecks());
     }
 }

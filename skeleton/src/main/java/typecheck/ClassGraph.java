@@ -20,14 +20,14 @@ public class ClassGraph {
     }
 
     public void addVertex(String name) {
-        if (!name.equals("") && vertexMap.get(name) == null) {
+        if (!"".equals(name) && vertexMap.get(name) == null) {
             vertexMap.put(name, new Vertex());
             root.addChildVertex(vertexMap.get(name));
         }
     }
 
     public void addEdge(String child, String parent) {
-        if (!child.equals("") && !parent.equals("") && vertexMap.get(parent) != null && vertexMap.get(child) != null) {
+        if (!"".equals(child) && !"".equals(parent) && vertexMap.get(parent) != null && vertexMap.get(child) != null) {
             Vertex vc = vertexMap.get(child);
             Vertex vp = vertexMap.get(parent);
             vp.addChildVertex(vc);
