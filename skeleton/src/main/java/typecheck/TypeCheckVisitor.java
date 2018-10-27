@@ -22,7 +22,9 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
     }
 
     public String visit(MainClass n, Pair<String, Map<String, String>> env) {
-        if (!distinct(extractVarIds(n.f14))) {
+        List<String> ids = extractVarIds(n.f14);
+        ids.add(n.f11.f0.toString());
+        if (!distinct(ids)) {
             typeChecks = false;
             return null;
         }
@@ -111,7 +113,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String, Pair<String, Map<Stri
         String returnType = n.f10.accept(this, newEnv);
         n.f11.accept(this, env);
         n.f12.accept(this, env);
-        if (!subtype(returnType,extractTypeString(n.f1))) {
+        if (!subtype(returnType, extractTypeString(n.f1))) {
             typeChecks = false;
         }
         return null;
