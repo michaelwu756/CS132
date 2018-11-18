@@ -4,9 +4,7 @@ import syntaxtree.ClassDeclaration;
 import syntaxtree.ClassExtendsDeclaration;
 import visitor.DepthFirstVisitor;
 
-import static translation.TranslationHelper.extractMethodSignatureList;
-import static translation.TranslationHelper.extractVarList;
-import static typecheck.Helper.className;
+import static typecheck.Helper.*;
 
 public class TranslationVisitor extends DepthFirstVisitor {
     private TranslationGraph graph = new TranslationGraph();
@@ -15,8 +13,8 @@ public class TranslationVisitor extends DepthFirstVisitor {
         String id = className(n);
         graph.addVertex(id);
         graph.addDefinedClass(id);
-        graph.getVertex(id).addFieldList(extractVarList(n.f3));
-        graph.getVertex(id).addMethodList(extractMethodSignatureList(n.f4));
+        graph.getVertex(id).addFieldList(extractVarIds(n.f3));
+        graph.getVertex(id).addMethodList(extractMethodNames(n.f4));
         super.visit(n);
     }
 
@@ -27,8 +25,8 @@ public class TranslationVisitor extends DepthFirstVisitor {
         graph.addDefinedClass(id);
         graph.addVertex(parentId);
         graph.addEdge(id, parentId);
-        graph.getVertex(id).addFieldList(extractVarList(n.f5));
-        graph.getVertex(id).addMethodList(extractMethodSignatureList(n.f6));
+        graph.getVertex(id).addFieldList(extractVarIds(n.f5));
+        graph.getVertex(id).addMethodList(extractMethodNames(n.f6));
         super.visit(n);
     }
 

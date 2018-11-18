@@ -1,8 +1,5 @@
 package translation;
 
-import typecheck.MethodSignature;
-import typecheck.Pair;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +35,7 @@ public class TranslationGraph {
         return vertexMap.get(name);
     }
 
-    public List<Pair<String, MethodSignature>> getMethodList(String name) {
+    public List<String> getMethodList(String name) {
         return vertexMap.get(name).getMethodList();
     }
 
@@ -46,7 +43,7 @@ public class TranslationGraph {
         return vertexMap.get(name).getMethodOffsetMap();
     }
 
-    public List<Pair<String, String>> getFieldList(String name) {
+    public List<String> getFieldList(String name) {
         return vertexMap.get(name).getFieldList();
     }
 
