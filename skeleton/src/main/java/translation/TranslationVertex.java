@@ -7,7 +7,6 @@ import java.util.*;
 
 public class TranslationVertex {
     private boolean visited = false;
-    private Set<TranslationVertex> childVertices = new HashSet<>();
     private Set<TranslationVertex> parentVertices = new HashSet<>();
     private List<Pair<String, String>> fieldList = new ArrayList<>();
     private List<Pair<String, MethodSignature>> methodList = new ArrayList<>();
@@ -17,16 +16,12 @@ public class TranslationVertex {
         this.className = className;
     }
 
-    public void addChildVertex(TranslationVertex v) {
-        childVertices.add(v);
-    }
-
     public void addParentVertex(TranslationVertex v) {
         parentVertices.add(v);
     }
 
-    public boolean isVisited() {
-        return visited;
+    public boolean unVisited() {
+        return !visited;
     }
 
     public void addFieldList(List<Pair<String, String>> list) {
@@ -46,7 +41,7 @@ public class TranslationVertex {
             }
         } else {
             for (TranslationVertex p : parentVertices) {
-                if (!p.isVisited()) {
+                if (p.unVisited()) {
                     methods = p.getMethodList();
                     Map<String, Pair<String, MethodSignature>> parentMethodClassMap = p.getMethodClassMap();
                     for (Pair<String, MethodSignature> m : methodList) {
@@ -72,9 +67,7 @@ public class TranslationVertex {
 
     public Map<String, Pair<String, MethodSignature>> getMethodClassMap() {
         Map<String, Pair<String, MethodSignature>> methodClassMap = new HashMap<>();
-        getMethodList().forEach(pair -> {
-            methodClassMap.put(pair.getKey().replaceAll("^.*\\.", ""), pair);
-        });
+        getMethodList().forEach(pair -> methodClassMap.put(pair.getKey().replaceAll("^.*\\.", ""), pair));
         return methodClassMap;
     }
 
@@ -91,7 +84,7 @@ public class TranslationVertex {
         List<Pair<String, String>> fields = new ArrayList<>();
         visited = true;
         for (TranslationVertex p : parentVertices) {
-            if (!p.isVisited()) {
+            if (p.unVisited()) {
                 fields = p.getFieldList();
             }
         }

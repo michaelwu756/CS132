@@ -21,7 +21,7 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
     private int boundsCounter = 1;
     private int andCounter = 1;
     private int tempCounter = 0;
-    private boolean arrayAlloced = false;
+    private boolean arrayAllocated = false;
 
     public MiniJavaToVaporVisitor() {
 
@@ -31,8 +31,7 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
         translation.append(TranslationHelper.getVirtualMemoryTables());
         n.f0.accept(this, env);
         n.f1.accept(this, env);
-        n.f2.accept(this, env);
-        if (arrayAlloced) {
+        if (arrayAllocated) {
             translation.append(
                     "\n" +
                             "func AllocArray(size)\n" +
@@ -51,49 +50,20 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
         }
         translation.append("func Main()\n");
         MiniJavaEnvironment newEnv = new MiniJavaEnvironment("  ", null, extractVarMap(n.f14));
-        n.f0.accept(this, env);
-        n.f1.accept(this, env);
-        n.f2.accept(this, env);
-        n.f3.accept(this, env);
-        n.f4.accept(this, env);
-        n.f5.accept(this, env);
-        n.f6.accept(this, env);
-        n.f7.accept(this, env);
-        n.f8.accept(this, env);
-        n.f9.accept(this, env);
-        n.f10.accept(this, env);
-        n.f11.accept(this, env);
-        n.f12.accept(this, env);
-        n.f13.accept(this, env);
-        n.f14.accept(this, env);
         n.f15.accept(this, newEnv);
-        n.f16.accept(this, env);
-        n.f17.accept(this, env);
         translation.append("  ret\n");
         return null;
     }
 
     public String visit(ClassDeclaration n, MiniJavaEnvironment env) {
         MiniJavaEnvironment newEnv = new MiniJavaEnvironment("", className(n), null);
-        n.f0.accept(this, env);
-        n.f1.accept(this, env);
-        n.f2.accept(this, env);
-        n.f3.accept(this, env);
         n.f4.accept(this, newEnv);
-        n.f5.accept(this, env);
         return null;
     }
 
     public String visit(ClassExtendsDeclaration n, MiniJavaEnvironment env) {
         MiniJavaEnvironment newEnv = new MiniJavaEnvironment("", className(n), null);
-        n.f0.accept(this, env);
-        n.f1.accept(this, env);
-        n.f2.accept(this, env);
-        n.f3.accept(this, env);
-        n.f4.accept(this, env);
-        n.f5.accept(this, env);
         n.f6.accept(this, newEnv);
-        n.f7.accept(this, env);
         return null;
     }
 
@@ -108,28 +78,18 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
         }
         translation.append(")\n");
         tempCounter = 0;
-        n.f0.accept(this, env);
-        n.f1.accept(this, env);
-        n.f2.accept(this, env);
-        n.f3.accept(this, env);
-        n.f4.accept(this, env);
-        n.f5.accept(this, env);
-        n.f6.accept(this, env);
-        n.f7.accept(this, env);
         n.f8.accept(this, newEnv);
-        n.f9.accept(this, env);
         String retVal = convertToTemp(n.f10.accept(this, newEnv), newEnv);
-        n.f11.accept(this, env);
-        n.f12.accept(this, env);
         translation.append("  ret ").append(retVal).append("\n");
         return null;
     }
 
     public String visit(AssignmentStatement n, MiniJavaEnvironment env) {
         String id = n.f0.accept(this, env);
-        n.f1.accept(this, env);
-        String expression = convertToTemp(n.f2.accept(this, env), env);
-        n.f3.accept(this, env);
+        String expression = n.f2.accept(this, env);
+        if (id.contains("[")) {
+            expression = convertToTemp(expression, env);
+        }
         translation.append(env.getIndentation()).append(id).append(" = ").append(expression).append("\n");
         return null;
     }
@@ -140,7 +100,6 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
                 .append(env.getIndentation()).append("  Error(\"null pointer\")\n")
                 .append(env.getIndentation()).append("null").append(String.valueOf(nullCounter)).append(":\n");
         nullCounter++;
-        n.f1.accept(this, env);
         String index = convertToTemp(n.f2.accept(this, env), env);
         String temp = "t." + String.valueOf(tempCounter);
         tempCounter++;
@@ -152,11 +111,8 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
                 .append(env.getIndentation()).append(temp).append(" = MulS(").append(index).append(" 4)\n")
                 .append(env.getIndentation()).append(temp).append(" = Add(").append(temp).append(" ").append(id).append(")\n");
         boundsCounter++;
-        n.f3.accept(this, env);
-        n.f4.accept(this, env);
         String expression = convertToTemp(n.f5.accept(this, env), env);
         translation.append(env.getIndentation()).append("[").append(temp).append("+4] = ").append(expression).append("\n");
-        n.f6.accept(this, env);
         return null;
     }
 
@@ -164,15 +120,11 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
         MiniJavaEnvironment newEnv = new MiniJavaEnvironment(env.getIndentation() + "  ", env.getCurrentClass(), env.getLocalVarMap());
         String ifNum = String.valueOf(ifCounter);
         ifCounter++;
-        n.f0.accept(this, env);
-        n.f1.accept(this, env);
         String condition = convertToTemp(n.f2.accept(this, env), env);
         translation.append(env.getIndentation()).append("if0 ").append(condition).append(" goto :if").append(ifNum).append("_else\n");
-        n.f3.accept(this, env);
         n.f4.accept(this, newEnv);
         translation.append(env.getIndentation()).append("  goto :if").append(ifNum).append("_end\n")
                 .append(env.getIndentation()).append("if").append(ifNum).append("_else:\n");
-        n.f5.accept(this, env);
         n.f6.accept(this, newEnv);
         translation.append(env.getIndentation()).append("if").append(ifNum).append("_end:\n");
         return null;
@@ -182,12 +134,9 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
         MiniJavaEnvironment newEnv = new MiniJavaEnvironment(env.getIndentation() + "  ", env.getCurrentClass(), env.getLocalVarMap());
         String whileNum = String.valueOf(whileCounter);
         whileCounter++;
-        n.f0.accept(this, env);
-        n.f1.accept(this, env);
         translation.append(env.getIndentation()).append("while").append(whileNum).append("_top:\n");
         String condition = convertToTemp(n.f2.accept(this, env), env);
         translation.append(env.getIndentation()).append("if0 ").append(condition).append(" goto :while").append(whileNum).append("_end\n");
-        n.f3.accept(this, env);
         n.f4.accept(this, newEnv);
         translation.append(env.getIndentation()).append("  goto :while").append(whileNum).append("_top\n")
                 .append(env.getIndentation()).append("while").append(whileNum).append("_end:\n");
@@ -195,12 +144,8 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
     }
 
     public String visit(PrintStatement n, MiniJavaEnvironment env) {
-        n.f0.accept(this, env);
-        n.f1.accept(this, env);
         String expression = convertToTemp(n.f2.accept(this, env), env);
         translation.append(env.getIndentation()).append("PrintIntS(").append(expression).append(")\n");
-        n.f3.accept(this, env);
-        n.f4.accept(this, env);
         return null;
     }
 
@@ -216,7 +161,6 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
         tempCounter++;
         String first = convertToTemp(n.f0.accept(this, env), env);
         translation.append(env.getIndentation()).append("if0 ").append(first).append(" goto :ss").append(andNum).append("_else\n");
-        n.f1.accept(this, env);
         String second = n.f2.accept(this, newEnv);
         translation.append(env.getIndentation()).append("  ").append(temp).append(" = ").append(second).append("\n")
                 .append(env.getIndentation()).append("  goto :ss").append(andNum).append("_end\n")
@@ -228,42 +172,26 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
 
     public String visit(CompareExpression n, MiniJavaEnvironment env) {
         String first = convertToTemp(n.f0.accept(this, env), env);
-        n.f1.accept(this, env);
         String second = convertToTemp(n.f2.accept(this, env), env);
-        String temp = "t." + String.valueOf(tempCounter);
-        tempCounter++;
-        translation.append(env.getIndentation()).append(temp).append(" = LtS(").append(first).append(" ").append(second).append(")\n");
-        return temp;
+        return "LtS(" + first + " " + second + ")";
     }
 
     public String visit(PlusExpression n, MiniJavaEnvironment env) {
         String first = convertToTemp(n.f0.accept(this, env), env);
-        n.f1.accept(this, env);
         String second = convertToTemp(n.f2.accept(this, env), env);
-        String temp = "t." + String.valueOf(tempCounter);
-        tempCounter++;
-        translation.append(env.getIndentation()).append(temp).append(" = Add(").append(first).append(" ").append(second).append(")\n");
-        return temp;
+        return "Add(" + first + " " + second + ")";
     }
 
     public String visit(MinusExpression n, MiniJavaEnvironment env) {
         String first = convertToTemp(n.f0.accept(this, env), env);
-        n.f1.accept(this, env);
         String second = convertToTemp(n.f2.accept(this, env), env);
-        String temp = "t." + String.valueOf(tempCounter);
-        tempCounter++;
-        translation.append(env.getIndentation()).append(temp).append(" = Sub(").append(first).append(" ").append(second).append(")\n");
-        return temp;
+        return "Sub(" + first + " " + second + ")";
     }
 
     public String visit(TimesExpression n, MiniJavaEnvironment env) {
         String first = convertToTemp(n.f0.accept(this, env), env);
-        n.f1.accept(this, env);
         String second = convertToTemp(n.f2.accept(this, env), env);
-        String temp = "t." + String.valueOf(tempCounter);
-        tempCounter++;
-        translation.append(env.getIndentation()).append(temp).append(" = MulS(").append(first).append(" ").append(second).append(")\n");
-        return temp;
+        return "MulS(" + first + " " + second + ")";
     }
 
     public String visit(ArrayLookup n, MiniJavaEnvironment env) {
@@ -272,7 +200,6 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
                 .append(env.getIndentation()).append("  Error(\"null pointer\")\n")
                 .append(env.getIndentation()).append("null").append(String.valueOf(nullCounter)).append(":\n");
         nullCounter++;
-        n.f1.accept(this, env);
         String index = convertToTemp(n.f2.accept(this, env), env);
         String temp = "t." + String.valueOf(tempCounter);
         tempCounter++;
@@ -282,25 +209,18 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
                 .append(env.getIndentation()).append("  Error(\"array index out of bounds\")\n")
                 .append(env.getIndentation()).append("bounds").append(String.valueOf(boundsCounter)).append(":\n")
                 .append(env.getIndentation()).append(temp).append(" = MulS(").append(index).append(" 4)\n")
-                .append(env.getIndentation()).append(temp).append(" = Add(").append(temp).append(" ").append(id).append(")\n")
-                .append(env.getIndentation()).append(temp).append(" = [").append(temp).append("+4]\n");
+                .append(env.getIndentation()).append(temp).append(" = Add(").append(temp).append(" ").append(id).append(")\n");
         boundsCounter++;
-        n.f3.accept(this, env);
-        return temp;
+        return "[" + temp + "+4]";
     }
 
     public String visit(ArrayLength n, MiniJavaEnvironment env) {
         String id = convertToTemp(n.f0.accept(this, env), env);
-        String temp = "t." + String.valueOf(tempCounter);
-        tempCounter++;
         translation.append(env.getIndentation()).append("if ").append(id).append(" goto :null").append(String.valueOf(nullCounter)).append("\n")
                 .append(env.getIndentation()).append("  Error(\"null pointer\")\n")
-                .append(env.getIndentation()).append("null").append(String.valueOf(nullCounter)).append(":\n")
-                .append(env.getIndentation()).append(temp).append(" = [").append(id).append("]\n");
+                .append(env.getIndentation()).append("null").append(String.valueOf(nullCounter)).append(":\n");
         nullCounter++;
-        n.f1.accept(this, env);
-        n.f2.accept(this, env);
-        return temp;
+        return "[" + id + "]";
     }
 
     public String visit(MessageSend n, MiniJavaEnvironment env) {
@@ -311,9 +231,9 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
             translation.append(env.getIndentation()).append("if ").append(id).append(" goto :null").append(String.valueOf(nullCounter)).append("\n")
                     .append(env.getIndentation()).append("  Error(\"null pointer\")\n")
                     .append(env.getIndentation()).append("null").append(String.valueOf(nullCounter)).append(":\n");
+            nullCounter++;
         }
         translation.append(env.getIndentation()).append(temp1).append(" = [").append(id).append("]\n");
-        nullCounter++;
         Map<String, String> typeMap = fields(env.getCurrentClass());
         if (typeMap != null) {
             typeMap.putAll(env.getLocalVarMap());
@@ -324,16 +244,12 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
         String idType = n.f0.accept(new TypeCheckVisitor(), typeCheckEnvironment);
         String offset = String.valueOf(getMethodOffset(idType, n.f2.f0.toString()));
         translation.append(env.getIndentation()).append(temp1).append(" = [").append(temp1).append("+").append(offset).append("]\n");
-        n.f1.accept(this, env);
-        n.f2.accept(this, env);
-        n.f3.accept(this, env);
         List<String> expressionListIds = getExpressionListIds(n.f4, env);
-        String temp2 = "t." + String.valueOf(tempCounter);
-        tempCounter++;
-        translation.append(env.getIndentation()).append(temp2).append(" = call ").append(temp1).append("(").append(id);
-        expressionListIds.forEach(expression -> translation.append(" ").append(expression));
-        translation.append(")\n");
-        return temp2;
+        StringBuilder ret = new StringBuilder();
+        ret.append("call ").append(temp1).append("(").append(id);
+        expressionListIds.forEach(expression -> ret.append(" ").append(expression));
+        ret.append(")");
+        return ret.toString();
     }
 
     public String visit(PrimaryExpression n, MiniJavaEnvironment env) {
@@ -369,11 +285,8 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
 
     public String visit(ArrayAllocationExpression n, MiniJavaEnvironment env) {
         String expression = convertToTemp(n.f3.accept(this, env), env);
-        String temp = "t." + String.valueOf(tempCounter);
-        tempCounter++;
-        translation.append(env.getIndentation()).append(temp).append(" = call :AllocArray(").append(expression).append(")\n");
-        arrayAlloced = true;
-        return temp;
+        arrayAllocated = true;
+        return "call :AllocArray(" + expression + ")";
     }
 
     public String visit(AllocationExpression n, MiniJavaEnvironment env) {
@@ -387,10 +300,7 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
 
     public String visit(NotExpression n, MiniJavaEnvironment env) {
         String expression = convertToTemp(n.f1.accept(this, env), env);
-        String temp = "t." + String.valueOf(tempCounter);
-        tempCounter++;
-        translation.append(env.getIndentation()).append(temp).append(" = Sub(1 ").append(expression).append(")\n");
-        return temp;
+        return "Sub(1 " + expression + ")";
     }
 
     public String visit(BracketExpression n, MiniJavaEnvironment env) {
@@ -417,7 +327,7 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
     }
 
     private String convertToTemp(String id, MiniJavaEnvironment env) {
-        if (id.contains("[")) {
+        if (id.contains("[") || id.contains("Sub") || id.contains("Add") || id.contains("MulS") || id.contains("LtS") || id.contains("call")) {
             String temp = "t." + String.valueOf(tempCounter);
             tempCounter++;
             translation.append(env.getIndentation()).append(temp).append(" = ").append(id).append("\n");

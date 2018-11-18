@@ -9,13 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TranslationGraph {
-    private TranslationVertex root = new TranslationVertex("");
     private Map<String, TranslationVertex> vertexMap = new HashMap<>();
     private List<String> definedClasses = new ArrayList<>();
-
-    public TranslationGraph() {
-        vertexMap.put("", root);
-    }
 
     public void addDefinedClass(String className) {
         definedClasses.add(className);
@@ -24,7 +19,6 @@ public class TranslationGraph {
     public void addVertex(String name) {
         if (!"".equals(name) && vertexMap.get(name) == null) {
             vertexMap.put(name, new TranslationVertex(name));
-            root.addChildVertex(vertexMap.get(name));
         }
     }
 
@@ -32,7 +26,6 @@ public class TranslationGraph {
         if (!"".equals(child) && !"".equals(parent) && vertexMap.get(parent) != null && vertexMap.get(child) != null) {
             TranslationVertex vc = vertexMap.get(child);
             TranslationVertex vp = vertexMap.get(parent);
-            vp.addChildVertex(vc);
             vc.addParentVertex(vp);
         }
     }
