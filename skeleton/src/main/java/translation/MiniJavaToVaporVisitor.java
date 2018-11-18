@@ -225,7 +225,7 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
 
     public String visit(MessageSend n, MiniJavaEnvironment env) {
         String id = convertToTemp(n.f0.accept(this, env), env);
-        String temp1 = "t." + String.valueOf(tempCounter);
+        String temp = "t." + String.valueOf(tempCounter);
         tempCounter++;
         if (!id.equals("this")) {
             translation.append(env.getIndentation()).append("if ").append(id).append(" goto :null").append(String.valueOf(nullCounter)).append("\n")
@@ -233,7 +233,7 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
                     .append(env.getIndentation()).append("null").append(String.valueOf(nullCounter)).append(":\n");
             nullCounter++;
         }
-        translation.append(env.getIndentation()).append(temp1).append(" = [").append(id).append("]\n");
+        translation.append(env.getIndentation()).append(temp).append(" = [").append(id).append("]\n");
         Map<String, String> typeMap = fields(env.getCurrentClass());
         if (typeMap != null) {
             typeMap.putAll(env.getLocalVarMap());
@@ -243,10 +243,10 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
         Pair<String, Map<String, String>> typeCheckEnvironment = new Pair<>(env.getCurrentClass(), typeMap);
         String idType = n.f0.accept(new TypeCheckVisitor(), typeCheckEnvironment);
         String offset = String.valueOf(getMethodOffset(idType, n.f2.f0.toString()));
-        translation.append(env.getIndentation()).append(temp1).append(" = [").append(temp1).append("+").append(offset).append("]\n");
+        translation.append(env.getIndentation()).append(temp).append(" = [").append(temp).append("+").append(offset).append("]\n");
         List<String> expressionListIds = getExpressionListIds(n.f4, env);
         StringBuilder ret = new StringBuilder();
-        ret.append("call ").append(temp1).append("(").append(id);
+        ret.append("call ").append(temp).append("(").append(id);
         expressionListIds.forEach(expression -> ret.append(" ").append(expression));
         ret.append(")");
         return ret.toString();
