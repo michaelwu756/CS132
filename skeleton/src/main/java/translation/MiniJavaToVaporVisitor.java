@@ -23,10 +23,6 @@ public class MiniJavaToVaporVisitor extends GJDepthFirst<String, MiniJavaEnviron
     private int tempCounter = 0;
     private boolean arrayAllocated = false;
 
-    public MiniJavaToVaporVisitor() {
-
-    }
-
     public String visit(Goal n, MiniJavaEnvironment env) {
         translation.append(TranslationHelper.getVirtualMemoryTables());
         n.f0.accept(this, env);

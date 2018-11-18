@@ -3,7 +3,6 @@ package translation;
 import syntaxtree.Goal;
 
 public class TranslationHelper {
-
     private static TranslationGraph graph = null;
 
     public static void init(Goal g) {
