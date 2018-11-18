@@ -55,7 +55,7 @@ public class TranslationVertex {
                                 }
                             }
                         } else {
-                            methods.add(new Pair<>(className + "." + m.getKey(), m).getValue());
+                            methods.add(new Pair<>(className + "." + m.getKey(), m.getValue()));
                         }
                     }
                 }
