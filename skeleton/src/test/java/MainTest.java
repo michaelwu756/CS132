@@ -22,7 +22,7 @@ public class MainTest {
 
     @Test
     public void testAppHasAGreeting() {
-        Typecheck classUnderTest = new Typecheck();
+        J2V classUnderTest = new J2V();
         assertNotNull(classUnderTest);
         assertTrue(true);
     }
