@@ -47,18 +47,6 @@ public class LivenessVisitor extends VInstr.VisitorP<Integer, RuntimeException> 
         if (function.params.length - 4 > inCounter) {
             inCounter = function.params.length - 4;
         }
-        /*System.err.println("Liveness of Function " + function.ident);
-        for (String var : function.vars) {
-            if (variableLivenessIntervals.get(var) != null) {
-                System.err.println(var + ": " + variableLivenessIntervals.get(var).getStart() + "-" + variableLivenessIntervals.get(var).getEnd());
-            } else {
-                System.err.println(var + ":");
-            }
-        }
-        System.err.println("assignments");
-        for (String var : function.vars) {
-            System.err.println(var + ": " + variableAssignments.get(var));
-        }*/
     }
 
     public void visit(Integer instructionNumber, VAssign var1) throws RuntimeException {
