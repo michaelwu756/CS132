@@ -41,26 +41,26 @@ sourceSets {
         java { srcDir "src/parse/java" }
     }
     main {
-        java { 
+        java {
             compileClasspath += parse.output;
             runtimeClasspath += parse.output
         }
     }
     test {
-        java { 
+        java {
             compileClasspath += parse.output;
             runtimeClasspath += parse.output
         }
     }
 }
 
-test { 
-  testLogging { 
+test {
+  testLogging {
     showStandardStreams = true
   }
 }
 
-task run (type: JavaExec) { 
+task run (type: JavaExec) {
     standardInput = System.in
     main = mainClass()
     classpath = sourceSets.main.runtimeClasspath + sourceSets.parse.runtimeClasspath
@@ -72,8 +72,8 @@ task sourcesTar(type: Tar, dependsOn: classes) {
 
 task pregrade(type: Exec) {
     dependsOn sourcesTar, test
-    executable "bash"
-    args "./grade.sh", homework, ".", 
+    executable "C:/Program Files/Git/bin/bash.exe"
+    args "./grade.sh", homework, ".",
       "testcases/${homework}", "build/distributions/${rootProject.name}.tar"
 }
 

@@ -97,7 +97,7 @@ function grade () {
         OUT_FILE="tests/$(basename "$file").stdout"
         ERR_FILE="tests/$(basename "$file").stderr"
         DIFF_FILE="tests/$(basename "$file").diff"
-    
+
         $JAVA -Djava.security.manager -Djava.security.policy=="misc/JavaSecurityPolicy.policy" \
            -cp "$LIBRARIES" "$MAINCLASS" <"$file" >"$OUT_FILE" 2>"$ERR_FILE"
 
@@ -112,7 +112,7 @@ function grade () {
         if [[ ! -f "$file.out" ]]; then
             warn "$file.out does not exist"
         else
-            diff "$RESULT_FILE" "$file.out" > "$DIFF_FILE"
+            diff --strip-trailing-cr "$RESULT_FILE" "$file.out" > "$DIFF_FILE"
 
             if [ "$?" == "0" ]; then
                 rm "$DIFF_FILE"
@@ -128,7 +128,7 @@ function grade () {
         fi
     done
     set -e
-    SUCC=$(wc -l <succeeded) 
+    SUCC=$(wc -l <succeeded)
     percent=$((200*$SUCC/$COUNT % 2 + 100*$SUCC/$COUNT))
     echo "$SUID" "$percent" "$SHA256"
 }
@@ -168,7 +168,7 @@ fi
 
 HOMEWORK=$1; shift;
 GRADE_FOLDER=$(cd "$(dirname "$1")" && pwd)/$(basename "$1"); shift;
-LIB_FOLDER="$GRADE_FOLDER/lib"
+LIB_FOLDER="C:/Users/chees/Documents/Git/CS132/skeleton/lib"
 MISC_FOLDER="$GRADE_FOLDER/misc"
 ILLEGAL_FILES="$MISC_FOLDER/illegalfiles"
 TIMEOUT=5s
@@ -181,22 +181,22 @@ case $HOMEWORK in
         ;;
     "hw2")
         MAINCLASS="Typecheck"
-        LIBRARIES="classes:$LIB_FOLDER/minijava-parser.jar"
+        LIBRARIES="classes;$LIB_FOLDER/minijava-parser.jar"
         GENRESULT="copy"
         ;;
     "hw3")
         MAINCLASS="J2V"
-        LIBRARIES="classes:$LIB_FOLDER/minijava-parser.jar"
+        LIBRARIES="classes;$LIB_FOLDER/minijava-parser.jar"
         GENRESULT="vapor_eval"
         ;;
     "hw4")
         MAINCLASS="V2VM"
-        LIBRARIES="classes:$LIB_FOLDER/vapor-parser.jar"
+        LIBRARIES="classes;$LIB_FOLDER/vapor-parser.jar"
         GENRESULT="vaporm_eval"
         ;;
     "hw5")
         MAINCLASS="VM2M"
-        LIBRARIES="classes:$LIB_FOLDER/vapor-parser.jar"
+        LIBRARIES="classes;$LIB_FOLDER/vapor-parser.jar"
         GENRESULT="mips_eval"
         ;;
     *)
@@ -230,7 +230,7 @@ fi
 
 if command -v sha256sum >/dev/null 2>&1; then
     export SHA256SUM_CMD="sha256sum"
-else 
+else
     warn "Couldn't find 'sha256sum'. Install it for checksums of tars."
 fi
 
@@ -258,7 +258,7 @@ if [[ -f "$TAR_FOLDER" ]]; then
 
     # Throw away the results, as the final grade will have more test-cases
     grade "$TAR_FOLDER"
-else 
+else
     # Grade all items in the tar folder:
     find "$TAR_FOLDER" -name "*.tar" \
         | sort \
